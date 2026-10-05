@@ -68,7 +68,6 @@ catalog:
 
 autoInstallPeers: false
 
-<<<<<<< HEAD
 onlyBuiltDependencies:
   - '@swc/core'
   - esbuild
@@ -157,17 +156,10 @@ overrides:
   "@expo/ngrok-bin>@expo/ngrok-bin-win32-ia32": "-"
   "@expo/ngrok-bin>@expo/ngrok-bin-win32-x64": "-"
   # drizzle-kit uses esbuild internally on an older version that's vulnerable, this overrides it
-=======
-overrides:
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   "@esbuild-kit/esm-loader": "npm:tsx@^4.21.0"
   esbuild: "0.28.2"
   # orval pins js-yaml to an exact version older than the CVE fix (>=4.3.2)
   js-yaml: '4.3.2'
-<<<<<<< HEAD
-=======
-
 allowBuilds:
   '@clerk/shared': true
   esbuild: true
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
