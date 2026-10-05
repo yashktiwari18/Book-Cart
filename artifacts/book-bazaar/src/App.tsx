@@ -21,8 +21,13 @@ import {
   useAddCartItem, useUpdateCartItem, useRemoveCartItem,
   useListOrders, getListOrdersQueryKey,
   useCreateOrder, useGetOrder, getGetOrderQueryKey,
+<<<<<<< HEAD
 } from '@workspace/api-client-react';
 import type { Book, Order, Promotion } from '@workspace/api-client-react';
+=======
+  type Book, type Order, type Promotion,
+} from './lib/useBookstore';
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -30,6 +35,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 45_000, retry: 1, refetchOnWindowFocus: false } },
 });
+<<<<<<< HEAD
 const clerkPubKey = publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -37,6 +43,48 @@ function stripBase(path: string) {
   return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || '/' : path;
 }
 if (!clerkPubKey) throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in .env file');
+=======
+let clerkPubKey: string | undefined;
+try {
+  const envKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+  if (envKey && typeof envKey === 'string' && envKey.startsWith('pk_')) {
+    const derived = publishableKeyFromHost(window.location.hostname, envKey);
+    clerkPubKey = derived || undefined;
+  }
+} catch {
+  clerkPubKey = undefined;
+}
+const clerkProxyUrl = import.meta.env.DEV ? undefined : import.meta.env.VITE_CLERK_PROXY_URL;
+const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+function stripBase(path: string) {
+  return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || '/' : path;
+}
+
+// Standalone (no-Clerk) versions of auth hooks
+function useDemoUser() {
+  return {
+    isLoaded: true,
+    isSignedIn: true,
+    user: {
+      firstName: 'Book Bazaar',
+      fullName: 'Demo Reader',
+      primaryEmailAddress: { emailAddress: 'reader@bookbazaar.in' },
+    },
+  };
+}
+function useDemoAuth() {
+  return { isLoaded: true, isSignedIn: true };
+}
+
+// Selects the right hook at a stable call-site level (no conditional hook inside a single component)
+const useSafeUser: () => ReturnType<typeof useUser> | ReturnType<typeof useDemoUser> = clerkPubKey
+  ? () => useUser()    // eslint-disable-line react-hooks/rules-of-hooks
+  : useDemoUser;
+
+const useSafeAuth: () => { isLoaded: boolean; isSignedIn: boolean | undefined } = clerkPubKey
+  ? () => useAuth()   // eslint-disable-line react-hooks/rules-of-hooks
+  : useDemoAuth;
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 
 const clerkAppearance = {
   theme: shadcn, cssLayerName: 'clerk',
@@ -82,8 +130,36 @@ function ClerkQueryClientCacheInvalidator() {
   return null;
 }
 
+<<<<<<< HEAD
 function ClerkRoutes() {
   const [, setLocation] = useLocation();
+=======
+function AppRoutes() {
+  const [, setLocation] = useLocation();
+  const routes = (
+    <Switch>
+      <Route path="/" component={HomeRedirect} />
+      <Route path="/sign-in/*?" component={SignInPage} />
+      <Route path="/sign-up/*?" component={SignUpPage} />
+      <Route path="/shop"><Protected><ShopPage /></Protected></Route>
+      <Route path="/search"><Protected><SearchPage /></Protected></Route>
+      <Route path="/cart"><Protected><CartPage /></Protected></Route>
+      <Route path="/orders"><Protected><OrdersPage /></Protected></Route>
+      <Route path="/orders/:orderId"><Protected><OrderDetailPage /></Protected></Route>
+      <Route path="/profile"><Protected><ProfilePage /></Protected></Route>
+      <Route><NotFound /></Route>
+    </Switch>
+  );
+
+  if (!clerkPubKey) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        {routes}
+      </QueryClientProvider>
+    );
+  }
+
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   return (
     <ClerkProvider
       publishableKey={clerkPubKey}
@@ -100,6 +176,7 @@ function ClerkRoutes() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
+<<<<<<< HEAD
         <Switch>
           <Route path="/" component={HomeRedirect} />
           <Route path="/sign-in/*?" component={SignInPage} />
@@ -112,28 +189,64 @@ function ClerkRoutes() {
           <Route path="/profile"><Protected><ProfilePage /></Protected></Route>
           <Route><NotFound /></Route>
         </Switch>
+=======
+        {routes}
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
       </QueryClientProvider>
     </ClerkProvider>
   );
 }
 
 function SignInPage() {
+<<<<<<< HEAD
   return <div className="auth-scene"><div className="auth-aside"><Brand /><p>All the right books<br />for a year of big ideas.</p><small>Thoughtfully selected for every classroom, from Class 1 to 12.</small></div><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} /></div>;
 }
 function SignUpPage() {
   return <div className="auth-scene"><div className="auth-aside"><Brand /><p>A fresh chapter<br />starts right here.</p><small>Join families making school shopping a little simpler.</small></div><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} /></div>;
 }
 function HomeRedirect() {
+=======
+  if (!clerkPubKey) return <Redirect to="/shop" />;
+  return <div className="auth-scene"><div className="auth-aside"><Brand /><p>All the right books<br />for a year of big ideas.</p><small>Thoughtfully selected for every classroom, from Class 1 to 12.</small></div><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} /></div>;
+}
+function SignUpPage() {
+  if (!clerkPubKey) return <Redirect to="/shop" />;
+  return <div className="auth-scene"><div className="auth-aside"><Brand /><p>A fresh chapter<br />starts right here.</p><small>Join families making school shopping a little simpler.</small></div><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} /></div>;
+}
+// Clerk-aware version — only used inside ClerkProvider
+function HomeRedirectClerk() {
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const { isLoaded, isSignedIn } = useAuth();
   if (!isLoaded) return <LoadingPage />;
   return isSignedIn ? <Redirect to="/shop" /> : <LandingPage />;
 }
+<<<<<<< HEAD
 function Protected({ children }: { children: ReactNode }) {
+=======
+// Standalone version — no Clerk dependency
+function HomeRedirectDemo() {
+  return <Redirect to="/shop" />;
+}
+
+// Clerk-aware guard — only used inside ClerkProvider
+function ProtectedClerk({ children }: { children: ReactNode }) {
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const { isLoaded, isSignedIn } = useAuth();
   if (!isLoaded) return <LoadingPage />;
   if (!isSignedIn) return <Redirect to="/sign-in" />;
   return <>{children}</>;
 }
+<<<<<<< HEAD
+=======
+// Standalone passthrough — no auth required
+function ProtectedDemo({ children }: { children: ReactNode }) {
+  return <>{children}</>;
+}
+
+// Aliases resolved once at module load — stable component references, no conditional hooks
+const HomeRedirect = clerkPubKey ? HomeRedirectClerk : HomeRedirectDemo;
+const Protected = clerkPubKey ? ProtectedClerk : ProtectedDemo;
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 
 function Brand({ compact = false }: { compact?: boolean }) {
   return <Link href="/" className={`brand${compact ? ' brand-compact' : ''}`} data-testid="link-home-brand">
@@ -180,7 +293,11 @@ function MobileAppHome({
 }) {
   const [activePromotion, setActivePromotion] = useState(0);
   const promotion = promotions[activePromotion] ?? promotions[0];
+<<<<<<< HEAD
   const { isSignedIn } = useAuth();
+=======
+  const { isSignedIn } = useSafeAuth();
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 
   return <div className="mobile-app-home">
     <header className="mobile-app-header">
@@ -302,7 +419,11 @@ function MobileBottomNav({
   count: number;
   isSignedIn?: boolean;
 }) {
+<<<<<<< HEAD
   const { isSignedIn: authIsSignedIn } = useAuth();
+=======
+  const { isSignedIn: authIsSignedIn } = useSafeAuth();
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const isSignedIn = isSignedInProp ?? authIsSignedIn;
 
   return <nav className="bottom-nav" aria-label="Main navigation">
@@ -317,7 +438,11 @@ function MobileBottomNav({
 }
 
 function AppShell({ children, active }: { children: ReactNode; active: string }) {
+<<<<<<< HEAD
   const { user } = useUser();
+=======
+  const { user } = useSafeUser();
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const cartQuery = useGetCart({ query: { queryKey: getGetCartQueryKey() } });
   const count = cartQuery.data?.itemCount ?? 0;
   return <div className="app-shell">
@@ -343,7 +468,11 @@ function ShopPage() {
   const cache = useQueryClient();
   const [added, setAdded] = useState<string | null>(null);
   const [addingBundle, setAddingBundle] = useState<string | null>(null);
+<<<<<<< HEAD
   const { user } = useUser();
+=======
+  const { user } = useSafeUser();
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const addBook = (book: Book) => addMutation.mutate({ data: { bookId: book.id, quantity: 1 } }, {
     onSuccess: () => { setAdded(book.id); void cache.invalidateQueries({ queryKey: getGetCartQueryKey() }); window.setTimeout(() => setAdded(null), 1300); },
   });
@@ -489,12 +618,23 @@ function useRouteParams(): { orderId?: string } {
 }
 
 function ProfilePage() {
+<<<<<<< HEAD
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
   const orders = useListOrders({ query: { queryKey: getListOrdersQueryKey() } });
   const [, setLocation] = useLocation();
   const name = user?.fullName || user?.firstName || 'Book Bazaar reader';
   return <AppShell active="/profile"><PageHeading kicker="YOUR BOOK BAZAAR" title="A little about you." text="Your account, your orders, your school-year essentials." /><div className="profile-layout"><section className="profile-card"><div className="profile-avatar">{isLoaded ? (user?.firstName?.slice(0,1) || 'B') : '…'}</div><div><span className="eyebrow">SIGNED IN AS</span><h2>{name}</h2><p>{user?.primaryEmailAddress?.emailAddress || ''}</p></div><span className="verified-mark"><ShieldCheck size={16} /> Verified account</span></section><section className="profile-quick"><Link href="/orders" className="profile-action"><span className="profile-action-icon"><ClipboardList size={19} /></span><span><b>Your orders</b><small>{orders.data?.length || 0} orders placed</small></span><ChevronRight size={17} /></Link><Link href="/cart" className="profile-action"><span className="profile-action-icon"><ShoppingBag size={19} /></span><span><b>Your basket</b><small>Pick up where you left off</small></span><ChevronRight size={17} /></Link><button className="profile-action logout-action" onClick={() => signOut({ redirectUrl: basePath || '/' }).then(() => setLocation('/'))} data-testid="button-sign-out"><span className="profile-action-icon"><LogOut size={19} /></span><span><b>Sign out</b><small>See you again soon</small></span><ChevronRight size={17} /></button></section><div className="profile-help"><CircleHelp size={18} /><span><b>Need a hand?</b><small>We’re happy to help with your order or book list.</small></span><a href="mailto:hello@bookbazaar.in" className="text-link">Get in touch <ArrowUpRight size={14} /></a></div></div></AppShell>;
+=======
+  const { user, isLoaded } = useSafeUser();
+  const orders = useListOrders({ query: { queryKey: getListOrdersQueryKey() } });
+  const [, setLocation] = useLocation();
+  const name = user?.fullName || user?.firstName || 'Book Bazaar reader';
+  const handleSignOut = () => {
+    setLocation('/');
+  };
+  return <AppShell active="/profile"><PageHeading kicker="YOUR BOOK BAZAAR" title="A little about you." text="Your account, your orders, your school-year essentials." /><div className="profile-layout"><section className="profile-card"><div className="profile-avatar">{isLoaded ? (user?.firstName?.slice(0,1) || 'B') : '…'}</div><div><span className="eyebrow">SIGNED IN AS</span><h2>{name}</h2><p>{user?.primaryEmailAddress?.emailAddress || ''}</p></div><span className="verified-mark"><ShieldCheck size={16} /> Verified account</span></section><section className="profile-quick"><Link href="/orders" className="profile-action"><span className="profile-action-icon"><ClipboardList size={19} /></span><span><b>Your orders</b><small>{orders.data?.length || 0} orders placed</small></span><ChevronRight size={17} /></Link><Link href="/cart" className="profile-action"><span className="profile-action-icon"><ShoppingBag size={19} /></span><span><b>Your basket</b><small>Pick up where you left off</small></span><ChevronRight size={17} /></Link><button className="profile-action logout-action" onClick={handleSignOut} data-testid="button-sign-out"><span className="profile-action-icon"><LogOut size={19} /></span><span><b>Sign out</b><small>See you again soon</small></span><ChevronRight size={17} /></button></section><div className="profile-help"><CircleHelp size={18} /><span><b>Need a hand?</b><small>We’re happy to help with your order or book list.</small></span><a href="mailto:hello@bookbazaar.in" className="text-link">Get in touch <ArrowUpRight size={14} /></a></div></div></AppShell>;
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 }
 
 function NotFound() {
@@ -505,6 +645,10 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
 }
 function App() {
+<<<<<<< HEAD
   return <TooltipProvider><WouterRouter base={basePath}><RoutedErrorBoundary><ClerkRoutes /></RoutedErrorBoundary></WouterRouter><Toaster /></TooltipProvider>;
+=======
+  return <TooltipProvider><WouterRouter base={basePath}><RoutedErrorBoundary><AppRoutes /></RoutedErrorBoundary></WouterRouter><Toaster /></TooltipProvider>;
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 }
 export default App;

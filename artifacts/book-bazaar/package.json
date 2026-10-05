@@ -50,7 +50,10 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
+<<<<<<< HEAD
     "@workspace/api-client-react": "workspace:*",
+=======
+>>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "cmdk": "^1.1.1",
