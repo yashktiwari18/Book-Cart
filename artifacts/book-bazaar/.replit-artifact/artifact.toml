@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Book Bazaar"
+description = "A responsive bookstore for school students and families, with class and subject browsing, book deals, bundles, accounts, cart, and order history."
+version = "1.0.0"
+id = "artifacts/book-bazaar"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18125
+
+[services.development]
+run = "pnpm --filter @workspace/book-bazaar run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/book-bazaar", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/book-bazaar/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18125"
+BASE_PATH = "/"
