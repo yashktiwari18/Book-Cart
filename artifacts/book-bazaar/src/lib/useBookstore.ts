@@ -27,7 +27,7 @@ export const getGetOrderQueryKey = (orderId: string) => ['orders', orderId];
 
 // Hooks
 export function useHealthCheck(options?: any) {
-  return useQuery({
+  return useQuery<{ status: string; timestamp: string }, Error>({
     queryKey: getHealthCheckQueryKey(),
     queryFn: async () => ({ status: 'ok', timestamp: new Date().toISOString() }),
     ...options?.query
@@ -35,7 +35,7 @@ export function useHealthCheck(options?: any) {
 }
 
 export function useGetCatalogSummary(options?: any) {
-  return useQuery({
+  return useQuery<{ bookCount: number; classCount: number; subjectCount: number; promotionCount: number }, Error>({
     queryKey: getGetCatalogSummaryQueryKey(),
     queryFn: async () => {
       const subjects = new Set(MOCK_BOOKS.map((b) => b.subject));
@@ -51,7 +51,7 @@ export function useGetCatalogSummary(options?: any) {
 }
 
 export function useGetCatalogFilters(options?: any) {
-  return useQuery({
+  return useQuery<{ classes: { level: number; label: string; bookCount: number }[]; subjects: { name: string; bookCount: number }[] }, Error>({
     queryKey: getGetCatalogFiltersQueryKey(),
     queryFn: async () => {
       const classCounts = new Map<number, number>();
@@ -79,7 +79,7 @@ export function useGetCatalogFilters(options?: any) {
 }
 
 export function useGetPromotions(options?: any) {
-  return useQuery({
+  return useQuery<Promotion[], Error>({
     queryKey: getGetPromotionsQueryKey(),
     queryFn: async () => MOCK_PROMOTIONS,
     ...options?.query
@@ -87,7 +87,7 @@ export function useGetPromotions(options?: any) {
 }
 
 export function useListBooks(params?: { q?: string; classLevel?: number; subject?: string; dealOnly?: boolean; limit?: number }, options?: any) {
-  return useQuery({
+  return useQuery<Book[], Error>({
     queryKey: getListBooksQueryKey(params),
     queryFn: async () => {
       let filtered = [...MOCK_BOOKS];
@@ -119,7 +119,7 @@ export function useListBooks(params?: { q?: string; classLevel?: number; subject
 }
 
 export function useGetCart(options?: any) {
-  return useQuery({
+  return useQuery<Cart, Error>({
     queryKey: getGetCartQueryKey(),
     queryFn: async () => getLocalCart(),
     ...options?.query
@@ -180,7 +180,7 @@ export function useRemoveCartItem() {
 }
 
 export function useListOrders(options?: any) {
-  return useQuery({
+  return useQuery<Order[], Error>({
     queryKey: getListOrdersQueryKey(),
     queryFn: async () => getLocalOrders(),
     ...options?.query
@@ -201,7 +201,7 @@ export function useCreateOrder() {
 }
 
 export function useGetOrder(orderId: string, options?: any) {
-  return useQuery({
+  return useQuery<Order | null, Error>({
     queryKey: getGetOrderQueryKey(orderId),
     queryFn: async () => {
       const orders = getLocalOrders();
