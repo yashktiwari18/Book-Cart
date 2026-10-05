@@ -145,9 +145,17 @@ function Brand({ compact = false }: { compact?: boolean }) {
 function LandingPage() {
   const health = useHealthCheck({ query: { queryKey: getHealthCheckQueryKey() } });
   const summary = useGetCatalogSummary({ query: { queryKey: getGetCatalogSummaryQueryKey() } });
+  const filters = useGetCatalogFilters({ query: { queryKey: getGetCatalogFiltersQueryKey() } });
   const promo = useGetPromotions({ query: { queryKey: getGetPromotionsQueryKey() } });
-  const featured = promo.data?.[0];
+  const promotions = promo.data ?? [];
+  const featured = promotions[0];
   return <main className="landing">
+    <MobileAppHome
+      promotions={promotions}
+      classes={filters.data?.classes ?? []}
+      subjects={filters.data?.subjects ?? []}
+      bookCount={summary.data?.bookCount ?? 0}
+    />
     <header className="landing-nav wrap"><Brand /><div className="nav-help"><CircleHelp size={17} /> Here for the school year</div><div className="nav-actions"><Link href="/sign-in" className="nav-signin">Sign in</Link><Link href="/sign-up" className="button button-primary" data-testid="link-create-account">Create account <ArrowUpRight size={16} /></Link></div></header>
     <section className="landing-hero wrap">
       <div className="hero-copy"><div className="eyebrow"><span /> SCHOOL LISTS, SORTED.</div><h1>Every class.<br />Every <em>bright</em><br />beginning.</h1><p>The books students need, picked with care and delivered to your door. Make this school year the easiest one yet.</p><div className="hero-ctas"><Link href="/sign-up" className="button button-primary button-large">Start your book list <ArrowRight size={18} /></Link><Link href="/sign-in" className="text-link">Already have an account <ArrowUpRight size={15} /></Link></div><div className="trust-row"><span className="trust-icon"><ShieldCheck size={19} /></span><span><b>Safe, simple & school-ready</b><small>Thoughtfully chosen for the new school year</small></span></div></div>
@@ -157,6 +165,108 @@ function LandingPage() {
     <section className="landing-why wrap"><div><span className="eyebrow">THE BOOK BAZAAR DIFFERENCE</span><h2>A school list,<br /><em>without the scramble.</em></h2></div><div className="why-copy"><p>Skip the last-minute hunt from shop to shop. Find the right titles by class and subject, bundle what you need, and check out in a few easy steps.</p><Link href="/sign-up" className="text-link">Find your books <ArrowRight size={16} /></Link></div></section>
     <section className="landing-promo wrap"><div className="promo-mini"><div className="promo-art"><img src={featured?.imageUrl || '/books-editorial.jpg'} alt="" onError={(event) => { event.currentTarget.src = '/books-editorial.jpg'; }} /><div className="promo-copy"><span>{featured?.eyebrow || 'A LITTLE SOMETHING EXTRA'}</span><b>{featured?.title || 'A brighter school year, for less.'}</b><small>{featured?.subtitle || 'Explore thoughtful savings on class essentials.'}</small><Link href="/sign-up" className="promo-link">Explore offers <ArrowRight size={15} /></Link></div><strong>{featured?.discount ? `${featured.discount}%` : 'SAVE'}<small>ON SELECT<br />SCHOOL LISTS</small></strong></div></div><div className="landing-footer"><Brand compact /><span>Thoughtful books for curious minds.</span><small>Book Bazaar</small></div></section>
   </main>;
+}
+
+function MobileAppHome({
+  promotions,
+  classes,
+  subjects,
+  bookCount,
+}: {
+  promotions: Promotion[];
+  classes: { level: number; label: string; bookCount: number }[];
+  subjects: { name: string; bookCount: number }[];
+  bookCount: number;
+}) {
+  const [activePromotion, setActivePromotion] = useState(0);
+  const promotion = promotions[activePromotion] ?? promotions[0];
+  const { isSignedIn } = useAuth();
+
+  return <div className="mobile-app-home">
+    <header className="mobile-app-header">
+      <Brand compact />
+      <div className="mobile-delivery">
+        <MapPin size={18} />
+        <span><small>BOOKS FOR</small><b>Classes 1—12</b></span>
+        <ChevronDown size={14} />
+      </div>
+      <Link href="/sign-in" className="mobile-account-link" aria-label="Sign in">
+        <UserRound size={19} />
+      </Link>
+    </header>
+
+    <div className="mobile-home-tabs" aria-label="Browse book collections">
+      <a className="mobile-home-tab active" href="#mobile-class-list">By class</a>
+      <a className="mobile-home-tab" href="#mobile-subject-list">By subject</a>
+    </div>
+
+    <section className="mobile-featured-offer" aria-label="Featured book offer">
+      {promotion ? <Link
+        href="/sign-up"
+        className="mobile-offer-card"
+        style={{
+          backgroundColor: promotion.background,
+          backgroundImage: `linear-gradient(90deg, #173c30ed 0%, #285b45c9 56%, #285b4540 100%), url(${promotion.imageUrl})`,
+        }}
+      >
+        <span className="mobile-offer-eyebrow">{promotion.eyebrow}</span>
+        <span className="mobile-offer-discount">UP TO {promotion.discount}% OFF</span>
+        <h1>{promotion.title}</h1>
+        <p>{promotion.subtitle}</p>
+        <span className="mobile-offer-button">Browse the offer <ArrowRight size={15} /></span>
+      </Link> : <Link href="/sign-up" className="mobile-offer-card mobile-offer-fallback">
+        <span className="mobile-offer-eyebrow">BOOKS FOR EVERY CLASSROOM</span>
+        <h1>A good year<br />starts with a good book.</h1>
+        <span className="mobile-offer-button">Browse books <ArrowRight size={15} /></span>
+      </Link>}
+      {promotions.length > 1 && <div className="mobile-offer-dots" aria-label="Choose a promotion">
+        {promotions.map((item, index) => <button
+          key={item.id}
+          type="button"
+          className={index === activePromotion ? 'active' : ''}
+          aria-label={`Show offer ${index + 1}`}
+          aria-pressed={index === activePromotion}
+          onClick={() => setActivePromotion(index)}
+        />)}
+      </div>}
+    </section>
+
+    <section className="mobile-subject-list" id="mobile-subject-list">
+      <div className="mobile-section-heading">
+        <div><span className="eyebrow">THE RIGHT SUBJECT</span><h2>Browse subjects</h2></div>
+        <Link href="/sign-in" aria-label="Browse all subjects"><ArrowRight size={17} /></Link>
+      </div>
+      <div className="mobile-subject-rail">
+        {subjects.map((subject) => <Link className="mobile-subject-item" href="/sign-in" key={subject.name}>
+          <span className="mobile-subject-icon"><BookOpen size={20} /></span>
+          <b>{subject.name}</b>
+          <small>{subject.bookCount} {subject.bookCount === 1 ? 'title' : 'titles'}</small>
+        </Link>)}
+      </div>
+    </section>
+
+    <section className="mobile-class-list" id="mobile-class-list">
+      <div className="mobile-section-heading">
+        <div><span className="eyebrow">SCHOOL BOOKS, SORTED</span><h2>Shop by class</h2></div>
+        <span className="mobile-book-count">{bookCount} books</span>
+      </div>
+      <div className="mobile-class-rail">
+        {classes.map((grade) => <Link className="mobile-class-card" href="/sign-in" key={grade.level}>
+          <span>CLASS</span>
+          <strong>{String(grade.level).padStart(2, '0')}</strong>
+          <small>{grade.bookCount} {grade.bookCount === 1 ? 'book' : 'books'}</small>
+        </Link>)}
+      </div>
+    </section>
+
+    <Link href="/sign-up" className="mobile-start-card">
+      <span className="mobile-start-icon"><Sparkles size={19} /></span>
+      <span><b>Build your school list</b><small>Good books, all in one place</small></span>
+      <ArrowRight size={17} />
+    </Link>
+
+    <MobileBottomNav active="/shop" count={0} isSignedIn={isSignedIn} />
+  </div>;
 }
 
 function LoadingPage() {
@@ -183,6 +293,29 @@ const navItems = [
   { href: '/profile', label: 'Profile', Icon: UserRound },
 ];
 
+function MobileBottomNav({
+  active,
+  count,
+  isSignedIn: isSignedInProp,
+}: {
+  active: string;
+  count: number;
+  isSignedIn?: boolean;
+}) {
+  const { isSignedIn: authIsSignedIn } = useAuth();
+  const isSignedIn = isSignedInProp ?? authIsSignedIn;
+
+  return <nav className="bottom-nav" aria-label="Main navigation">
+    {navItems.map(({ href, label, Icon }) => {
+      const destination = label === 'Home' && !isSignedIn ? '/' : href;
+      return <Link key={href} href={destination} className={`bottom-link ${active === href ? 'selected' : ''}`} data-testid={`link-nav-${label.toLowerCase()}`}>
+        <span className="nav-icon-wrap"><Icon size={22} strokeWidth={active === href ? 2.2 : 1.8} />{label === 'Cart' && count > 0 && <i>{count}</i>}</span>
+        <small>{label}</small>
+      </Link>;
+    })}
+  </nav>;
+}
+
 function AppShell({ children, active }: { children: ReactNode; active: string }) {
   const { user } = useUser();
   const cartQuery = useGetCart({ query: { queryKey: getGetCartQueryKey() } });
@@ -190,7 +323,7 @@ function AppShell({ children, active }: { children: ReactNode; active: string })
   return <div className="app-shell">
     <header className="shop-header"><div className="wrap header-inner"><Brand compact /><div className="header-location"><MapPin size={17} /><span><small>DELIVERY DETAILS</small><b>Confirm at checkout</b></span><ChevronDown size={14} /></div><nav className="header-tabs" aria-label="Shop navigation"><Link href="/shop" className={active === '/shop' ? 'tab-active' : ''} data-testid="link-header-home">Home</Link><Link href="/search" className={active === '/search' ? 'tab-active' : ''} data-testid="link-header-search">Search</Link><Link href="/orders" className={active === '/orders' ? 'tab-active' : ''} data-testid="link-header-orders">Orders</Link></nav><div className="header-search"><Search size={17} /><Link href="/search">Search books, authors, subjects...</Link><kbd>⌘ K</kbd></div><Link href="/cart" className="header-cart" aria-label="Open cart" data-testid="link-header-cart"><ShoppingBag size={20} /><span>{count}</span></Link><Link href="/profile" className="header-avatar" aria-label="Profile">{user?.firstName?.slice(0, 1) || 'P'}</Link></div></header>
     <main className="wrap page-content">{children}</main>
-    <nav className="bottom-nav" aria-label="Main navigation">{navItems.map(({ href, label, Icon }) => <Link key={href} href={href} className={`bottom-link ${active === href ? 'selected' : ''}`} data-testid={`link-nav-${label.toLowerCase()}`}><span className="nav-icon-wrap"><Icon size={21} strokeWidth={active === href ? 2.2 : 1.8} />{label === 'Cart' && count > 0 && <i>{count}</i>}</span><small>{label}</small></Link>)}</nav>
+    <MobileBottomNav active={active} count={count} />
     <footer className="desktop-footer wrap"><span>Book Bazaar · The school bookshop</span><span>Books chosen for a better school day.</span></footer>
   </div>;
 }
