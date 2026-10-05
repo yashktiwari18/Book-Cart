@@ -21,13 +21,8 @@ import {
   useAddCartItem, useUpdateCartItem, useRemoveCartItem,
   useListOrders, getListOrdersQueryKey,
   useCreateOrder, useGetOrder, getGetOrderQueryKey,
-<<<<<<< HEAD
-} from '@workspace/api-client-react';
-import type { Book, Order, Promotion } from '@workspace/api-client-react';
-=======
   type Book, type Order, type Promotion,
 } from './lib/useBookstore';
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -35,15 +30,6 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 45_000, retry: 1, refetchOnWindowFocus: false } },
 });
-<<<<<<< HEAD
-const clerkPubKey = publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
-const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
-const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-function stripBase(path: string) {
-  return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || '/' : path;
-}
-if (!clerkPubKey) throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in .env file');
-=======
 let clerkPubKey: string | undefined;
 try {
   const envKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -84,7 +70,6 @@ const useSafeUser: () => ReturnType<typeof useUser> | ReturnType<typeof useDemoU
 const useSafeAuth: () => { isLoaded: boolean; isSignedIn: boolean | undefined } = clerkPubKey
   ? () => useAuth()   // eslint-disable-line react-hooks/rules-of-hooks
   : useDemoAuth;
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 
 const clerkAppearance = {
   theme: shadcn, cssLayerName: 'clerk',
@@ -130,10 +115,6 @@ function ClerkQueryClientCacheInvalidator() {
   return null;
 }
 
-<<<<<<< HEAD
-function ClerkRoutes() {
-  const [, setLocation] = useLocation();
-=======
 function AppRoutes() {
   const [, setLocation] = useLocation();
   const routes = (
@@ -159,7 +140,6 @@ function AppRoutes() {
     );
   }
 
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   return (
     <ClerkProvider
       publishableKey={clerkPubKey}
@@ -176,36 +156,13 @@ function AppRoutes() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
-<<<<<<< HEAD
-        <Switch>
-          <Route path="/" component={HomeRedirect} />
-          <Route path="/sign-in/*?" component={SignInPage} />
-          <Route path="/sign-up/*?" component={SignUpPage} />
-          <Route path="/shop"><Protected><ShopPage /></Protected></Route>
-          <Route path="/search"><Protected><SearchPage /></Protected></Route>
-          <Route path="/cart"><Protected><CartPage /></Protected></Route>
-          <Route path="/orders"><Protected><OrdersPage /></Protected></Route>
-          <Route path="/orders/:orderId"><Protected><OrderDetailPage /></Protected></Route>
-          <Route path="/profile"><Protected><ProfilePage /></Protected></Route>
-          <Route><NotFound /></Route>
-        </Switch>
-=======
         {routes}
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
       </QueryClientProvider>
     </ClerkProvider>
   );
 }
 
 function SignInPage() {
-<<<<<<< HEAD
-  return <div className="auth-scene"><div className="auth-aside"><Brand /><p>All the right books<br />for a year of big ideas.</p><small>Thoughtfully selected for every classroom, from Class 1 to 12.</small></div><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} /></div>;
-}
-function SignUpPage() {
-  return <div className="auth-scene"><div className="auth-aside"><Brand /><p>A fresh chapter<br />starts right here.</p><small>Join families making school shopping a little simpler.</small></div><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} /></div>;
-}
-function HomeRedirect() {
-=======
   if (!clerkPubKey) return <Redirect to="/shop" />;
   return <div className="auth-scene"><div className="auth-aside"><Brand /><p>All the right books<br />for a year of big ideas.</p><small>Thoughtfully selected for every classroom, from Class 1 to 12.</small></div><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} /></div>;
 }
@@ -213,40 +170,32 @@ function SignUpPage() {
   if (!clerkPubKey) return <Redirect to="/shop" />;
   return <div className="auth-scene"><div className="auth-aside"><Brand /><p>A fresh chapter<br />starts right here.</p><small>Join families making school shopping a little simpler.</small></div><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} /></div>;
 }
-// Clerk-aware version — only used inside ClerkProvider
+// Clerk-aware version â€” only used inside ClerkProvider
 function HomeRedirectClerk() {
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const { isLoaded, isSignedIn } = useAuth();
   if (!isLoaded) return <LoadingPage />;
   return isSignedIn ? <Redirect to="/shop" /> : <LandingPage />;
 }
-<<<<<<< HEAD
-function Protected({ children }: { children: ReactNode }) {
-=======
-// Standalone version — no Clerk dependency
+// Standalone version â€” no Clerk dependency
 function HomeRedirectDemo() {
   return <Redirect to="/shop" />;
 }
 
-// Clerk-aware guard — only used inside ClerkProvider
+// Clerk-aware guard â€” only used inside ClerkProvider
 function ProtectedClerk({ children }: { children: ReactNode }) {
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const { isLoaded, isSignedIn } = useAuth();
   if (!isLoaded) return <LoadingPage />;
   if (!isSignedIn) return <Redirect to="/sign-in" />;
   return <>{children}</>;
 }
-<<<<<<< HEAD
-=======
-// Standalone passthrough — no auth required
+// Standalone passthrough â€” no auth required
 function ProtectedDemo({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-// Aliases resolved once at module load — stable component references, no conditional hooks
+// Aliases resolved once at module load â€” stable component references, no conditional hooks
 const HomeRedirect = clerkPubKey ? HomeRedirectClerk : HomeRedirectDemo;
 const Protected = clerkPubKey ? ProtectedClerk : ProtectedDemo;
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 
 function Brand({ compact = false }: { compact?: boolean }) {
   return <Link href="/" className={`brand${compact ? ' brand-compact' : ''}`} data-testid="link-home-brand">
@@ -274,7 +223,7 @@ function LandingPage() {
       <div className="hero-copy"><div className="eyebrow"><span /> SCHOOL LISTS, SORTED.</div><h1>Every class.<br />Every <em>bright</em><br />beginning.</h1><p>The books students need, picked with care and delivered to your door. Make this school year the easiest one yet.</p><div className="hero-ctas"><Link href="/sign-up" className="button button-primary button-large">Start your book list <ArrowRight size={18} /></Link><Link href="/sign-in" className="text-link">Already have an account <ArrowUpRight size={15} /></Link></div><div className="trust-row"><span className="trust-icon"><ShieldCheck size={19} /></span><span><b>Safe, simple & school-ready</b><small>Thoughtfully chosen for the new school year</small></span></div></div>
       <div className="hero-art" aria-label="School books arranged on a desk"><div className="art-frame"><img src="/books-editorial.jpg" alt="Colorful school books ready for a new term" /><div className="art-stamp"><span>THE</span><b>NEW<br />TERM</b><span>STARTS HERE</span></div></div><div className="art-note"><Sparkles size={16} /> Good books. Great starts.</div><div className="art-count"><b>{summary.data?.bookCount ?? '120+'}</b><span>books for<br />every learner</span></div></div>
     </section>
-    <section className="landing-strip"><div className="wrap strip-inner"><span>CLASS 1—12</span><i /><span>CURATED SUBJECTS</span><i /><span>DOORSTEP DELIVERY</span><i /><span>PAY ON DELIVERY</span>{health.data?.status === 'ok' && <span className="health-live"><i /> Shop is online</span>}</div></section>
+    <section className="landing-strip"><div className="wrap strip-inner"><span>CLASS 1â€”12</span><i /><span>CURATED SUBJECTS</span><i /><span>DOORSTEP DELIVERY</span><i /><span>PAY ON DELIVERY</span>{health.data?.status === 'ok' && <span className="health-live"><i /> Shop is online</span>}</div></section>
     <section className="landing-why wrap"><div><span className="eyebrow">THE BOOK BAZAAR DIFFERENCE</span><h2>A school list,<br /><em>without the scramble.</em></h2></div><div className="why-copy"><p>Skip the last-minute hunt from shop to shop. Find the right titles by class and subject, bundle what you need, and check out in a few easy steps.</p><Link href="/sign-up" className="text-link">Find your books <ArrowRight size={16} /></Link></div></section>
     <section className="landing-promo wrap"><div className="promo-mini"><div className="promo-art"><img src={featured?.imageUrl || '/books-editorial.jpg'} alt="" onError={(event) => { event.currentTarget.src = '/books-editorial.jpg'; }} /><div className="promo-copy"><span>{featured?.eyebrow || 'A LITTLE SOMETHING EXTRA'}</span><b>{featured?.title || 'A brighter school year, for less.'}</b><small>{featured?.subtitle || 'Explore thoughtful savings on class essentials.'}</small><Link href="/sign-up" className="promo-link">Explore offers <ArrowRight size={15} /></Link></div><strong>{featured?.discount ? `${featured.discount}%` : 'SAVE'}<small>ON SELECT<br />SCHOOL LISTS</small></strong></div></div><div className="landing-footer"><Brand compact /><span>Thoughtful books for curious minds.</span><small>Book Bazaar</small></div></section>
   </main>;
@@ -293,18 +242,14 @@ function MobileAppHome({
 }) {
   const [activePromotion, setActivePromotion] = useState(0);
   const promotion = promotions[activePromotion] ?? promotions[0];
-<<<<<<< HEAD
-  const { isSignedIn } = useAuth();
-=======
   const { isSignedIn } = useSafeAuth();
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 
   return <div className="mobile-app-home">
     <header className="mobile-app-header">
       <Brand compact />
       <div className="mobile-delivery">
         <MapPin size={18} />
-        <span><small>BOOKS FOR</small><b>Classes 1—12</b></span>
+        <span><small>BOOKS FOR</small><b>Classes 1â€”12</b></span>
         <ChevronDown size={14} />
       </div>
       <Link href="/sign-in" className="mobile-account-link" aria-label="Sign in">
@@ -393,7 +338,7 @@ function Busy({ label = 'Loading your books' }: { label?: string }) {
   return <div className="busy-state" role="status"><span className="busy-mark"><BookOpen size={20} /></span><b>{label}</b><div className="skeleton-grid"><i /><i /><i /></div></div>;
 }
 function ErrorState({ retry }: { retry: () => void }) {
-  return <div className="state-panel"><span className="state-icon"><AlertCircle size={22} /></span><h3>That page took a wrong turn.</h3><p>We couldn’t load this just now. Check your connection and try again.</p><button className="button button-outline" onClick={retry} data-testid="button-retry">Try again <ArrowRight size={15} /></button></div>;
+  return <div className="state-panel"><span className="state-icon"><AlertCircle size={22} /></span><h3>That page took a wrong turn.</h3><p>We couldnâ€™t load this just now. Check your connection and try again.</p><button className="button button-outline" onClick={retry} data-testid="button-retry">Try again <ArrowRight size={15} /></button></div>;
 }
 function EmptyState({ title, text, action, to = '/shop' }: { title: string; text: string; action: string; to?: string }) {
   return <div className="state-panel empty-panel"><span className="state-icon"><BookMarked size={23} /></span><h3>{title}</h3><p>{text}</p><Link className="button button-primary" href={to}>{action} <ArrowRight size={15} /></Link></div>;
@@ -419,11 +364,7 @@ function MobileBottomNav({
   count: number;
   isSignedIn?: boolean;
 }) {
-<<<<<<< HEAD
-  const { isSignedIn: authIsSignedIn } = useAuth();
-=======
   const { isSignedIn: authIsSignedIn } = useSafeAuth();
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const isSignedIn = isSignedInProp ?? authIsSignedIn;
 
   return <nav className="bottom-nav" aria-label="Main navigation">
@@ -438,18 +379,14 @@ function MobileBottomNav({
 }
 
 function AppShell({ children, active }: { children: ReactNode; active: string }) {
-<<<<<<< HEAD
-  const { user } = useUser();
-=======
   const { user } = useSafeUser();
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const cartQuery = useGetCart({ query: { queryKey: getGetCartQueryKey() } });
   const count = cartQuery.data?.itemCount ?? 0;
   return <div className="app-shell">
-    <header className="shop-header"><div className="wrap header-inner"><Brand compact /><div className="header-location"><MapPin size={17} /><span><small>DELIVERY DETAILS</small><b>Confirm at checkout</b></span><ChevronDown size={14} /></div><nav className="header-tabs" aria-label="Shop navigation"><Link href="/shop" className={active === '/shop' ? 'tab-active' : ''} data-testid="link-header-home">Home</Link><Link href="/search" className={active === '/search' ? 'tab-active' : ''} data-testid="link-header-search">Search</Link><Link href="/orders" className={active === '/orders' ? 'tab-active' : ''} data-testid="link-header-orders">Orders</Link></nav><div className="header-search"><Search size={17} /><Link href="/search">Search books, authors, subjects...</Link><kbd>⌘ K</kbd></div><Link href="/cart" className="header-cart" aria-label="Open cart" data-testid="link-header-cart"><ShoppingBag size={20} /><span>{count}</span></Link><Link href="/profile" className="header-avatar" aria-label="Profile">{user?.firstName?.slice(0, 1) || 'P'}</Link></div></header>
+    <header className="shop-header"><div className="wrap header-inner"><Brand compact /><div className="header-location"><MapPin size={17} /><span><small>DELIVERY DETAILS</small><b>Confirm at checkout</b></span><ChevronDown size={14} /></div><nav className="header-tabs" aria-label="Shop navigation"><Link href="/shop" className={active === '/shop' ? 'tab-active' : ''} data-testid="link-header-home">Home</Link><Link href="/search" className={active === '/search' ? 'tab-active' : ''} data-testid="link-header-search">Search</Link><Link href="/orders" className={active === '/orders' ? 'tab-active' : ''} data-testid="link-header-orders">Orders</Link></nav><div className="header-search"><Search size={17} /><Link href="/search">Search books, authors, subjects...</Link><kbd>âŒ˜ K</kbd></div><Link href="/cart" className="header-cart" aria-label="Open cart" data-testid="link-header-cart"><ShoppingBag size={20} /><span>{count}</span></Link><Link href="/profile" className="header-avatar" aria-label="Profile">{user?.firstName?.slice(0, 1) || 'P'}</Link></div></header>
     <main className="wrap page-content">{children}</main>
     <MobileBottomNav active={active} count={count} />
-    <footer className="desktop-footer wrap"><span>Book Bazaar · The school bookshop</span><span>Books chosen for a better school day.</span></footer>
+    <footer className="desktop-footer wrap"><span>Book Bazaar Â· The school bookshop</span><span>Books chosen for a better school day.</span></footer>
   </div>;
 }
 
@@ -468,11 +405,7 @@ function ShopPage() {
   const cache = useQueryClient();
   const [added, setAdded] = useState<string | null>(null);
   const [addingBundle, setAddingBundle] = useState<string | null>(null);
-<<<<<<< HEAD
-  const { user } = useUser();
-=======
   const { user } = useSafeUser();
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
   const addBook = (book: Book) => addMutation.mutate({ data: { bookId: book.id, quantity: 1 } }, {
     onSuccess: () => { setAdded(book.id); void cache.invalidateQueries({ queryKey: getGetCartQueryKey() }); window.setTimeout(() => setAdded(null), 1300); },
   });
@@ -493,9 +426,9 @@ function ShopPage() {
   return <AppShell active="/shop">
     <div className="welcome-line"><span>GOOD MORNING, {(user?.firstName || 'FAMILY').toUpperCase()}</span><span className="secure-note"><ShieldCheck size={15} /> A better school year starts here</span></div>
     <section className="shop-hero">
-      <div className="shop-hero-copy"><span className="eyebrow">READY WHEN THE BELL RINGS</span><h1>Let’s get your<br /><em>school list</em> sorted.</h1><p>Books, bundles and the little details that make a big school year.</p><Link className="button button-cream" href="/search">Browse all books <ArrowRight size={16} /></Link></div>
+      <div className="shop-hero-copy"><span className="eyebrow">READY WHEN THE BELL RINGS</span><h1>Letâ€™s get your<br /><em>school list</em> sorted.</h1><p>Books, bundles and the little details that make a big school year.</p><Link className="button button-cream" href="/search">Browse all books <ArrowRight size={16} /></Link></div>
       <div className="shop-hero-photo"><img src="/books-editorial.jpg" alt="Colorful school books and stationery" /><div className="hero-photo-caption"><span>THE NEW TERM EDIT</span><b>Big ideas<br />begin here.</b></div><span className="photo-index">01 / 03</span></div>
-      <div className="hero-side-note"><span>BOOKS FOR</span><b>Class<br />1—12</b><GraduationCap size={20} /></div>
+      <div className="hero-side-note"><span>BOOKS FOR</span><b>Class<br />1â€”12</b><GraduationCap size={20} /></div>
     </section>
     <section className="promotions-section">
       <div className="section-head"><div><span className="eyebrow">A GOOD DEAL ON A GREAT START</span><h2>Offers for your book list</h2></div><div className="scroll-hint">SWIPE TO EXPLORE <ArrowRight size={14} /></div></div>
@@ -508,7 +441,7 @@ function ShopPage() {
     <section className="subjects-section"><div className="section-head"><div><span className="eyebrow">ONE SUBJECT AT A TIME</span><h2>Or browse a subject</h2></div></div><div className="subject-chips"><button onClick={() => setSubject('')} className={!subject ? 'active-chip' : ''} data-testid="button-subject-all">All subjects</button>{filters.data?.subjects?.map((s) => <button key={s.name} onClick={() => setSubject(subject === s.name ? '' : s.name)} className={subject === s.name ? 'active-chip' : ''} data-testid={`button-subject-${s.name.toLowerCase().replace(/\s+/g, '-')}`}>{s.name}<span>{s.bookCount}</span></button>)}</div></section>
     <SubjectBundles books={books.data || []} addBundle={addBundle} addingBundle={addingBundle} />
     <section className="books-section"><div className="section-head"><div><span className="eyebrow">{classLevel ? `CLASS ${classLevel}` : subject || 'HAND-PICKED FOR THE CLASSROOM'}</span><h2>{subject ? `${subject} favourites` : classLevel ? `Books for Class ${classLevel}` : 'Popular this week'}</h2></div><Link href="/search" className="text-link">See all titles <ArrowRight size={15} /></Link></div>
-      {addMutation.isError && <div className="inline-error" role="alert">We couldn’t add that title just now. Please try once more.</div>}
+      {addMutation.isError && <div className="inline-error" role="alert">We couldnâ€™t add that title just now. Please try once more.</div>}
       {!books.data?.length ? <EmptyState title="No titles in this corner yet." text="Try another class or subject to find your books." action="Browse all books" /> : <div className="book-grid">{books.data.map((book) => <BookCard key={book.id} book={book} add={() => addBook(book)} adding={addMutation.isPending && addMutation.variables?.data.bookId === book.id} added={added === book.id} />)}</div>}
       <div className="collection-note"><span className="collection-mark"><BookOpen size={22} /></span><div><b>Every book has a place on the list.</b><small>{summary.data?.bookCount ?? 'Hundreds of'} carefully selected titles, ready for the new term.</small></div><Link href="/search" className="round-arrow" aria-label="Browse collection"><ArrowRight size={17} /></Link></div>
     </section>
@@ -541,7 +474,7 @@ function SubjectBundles({ books, addBundle, addingBundle }: { books: Book[]; add
 function BookCard({ book, add, adding, added }: { book: Book; add: () => void; adding?: boolean; added?: boolean }) {
   return <article className="book-card" data-testid={`card-book-${book.id}`}>
     <div className="book-art"><img src={book.imageUrl || '/books-editorial.jpg'} alt={book.title} loading="lazy" onError={(event) => { event.currentTarget.src = '/books-editorial.jpg'; }} />{book.badge && <span className="book-badge">{book.badge}</span>}<button className="favorite-btn" aria-label={`Save ${book.title}`} onClick={(event) => { event.currentTarget.classList.toggle('hearted'); }} data-testid={`button-save-${book.id}`}><Heart size={16} /></button></div>
-    <div className="book-info"><div className="book-meta"><span>CLASS {book.classLevel}</span><span>{book.subject}</span></div><h3>{book.title}</h3><p>{book.author}</p><div className="book-rating"><Star size={13} fill="currentColor" /><b>{book.rating?.toFixed(1) ?? '4.8'}</b><span>·</span><span>{book.inStock ? 'In stock' : 'Available soon'}</span></div><div className="book-buy"><div><b>{money(book.price)}</b>{book.originalPrice > book.price && <del>{money(book.originalPrice)}</del>}</div><button className={`add-button ${added ? 'added' : ''}`} onClick={add} disabled={!book.inStock || adding} data-testid={`button-add-${book.id}`} aria-label={`Add ${book.title} to cart`}>{adding ? <LoaderCircle size={17} className="spin" /> : added ? <Check size={17} /> : <Plus size={18} />}</button></div></div>
+    <div className="book-info"><div className="book-meta"><span>CLASS {book.classLevel}</span><span>{book.subject}</span></div><h3>{book.title}</h3><p>{book.author}</p><div className="book-rating"><Star size={13} fill="currentColor" /><b>{book.rating?.toFixed(1) ?? '4.8'}</b><span>Â·</span><span>{book.inStock ? 'In stock' : 'Available soon'}</span></div><div className="book-buy"><div><b>{money(book.price)}</b>{book.originalPrice > book.price && <del>{money(book.originalPrice)}</del>}</div><button className={`add-button ${added ? 'added' : ''}`} onClick={add} disabled={!book.inStock || adding} data-testid={`button-add-${book.id}`} aria-label={`Add ${book.title} to cart`}>{adding ? <LoaderCircle size={17} className="spin" /> : added ? <Check size={17} /> : <Plus size={18} />}</button></div></div>
   </article>;
 }
 
@@ -560,9 +493,9 @@ function SearchPage() {
   const submitSearch = (event: FormEvent) => { event.preventDefault(); setLocation(`/search${q ? `?q=${encodeURIComponent(q)}` : ''}`); };
   if (filters.isError) return <AppShell active="/search"><ErrorState retry={() => { void filters.refetch(); }} /></AppShell>;
   return <AppShell active="/search"><PageHeading kicker="YOUR NEXT GREAT FIND" title="Find the right books." text="Search by title, author or subject. Use filters to narrow the list."><span className="result-count">{books.data?.length ?? 0} titles</span></PageHeading>
-    <form className="search-form" onSubmit={submitSearch}><Search size={20} /><input aria-label="Search books" placeholder="Try ‘Mathematics’ or an author name" value={q} onChange={(e) => setQ(e.target.value)} data-testid="input-search-books" /><button type="submit">Search <ArrowRight size={16} /></button></form>
+    <form className="search-form" onSubmit={submitSearch}><Search size={20} /><input aria-label="Search books" placeholder="Try â€˜Mathematicsâ€™ or an author name" value={q} onChange={(e) => setQ(e.target.value)} data-testid="input-search-books" /><button type="submit">Search <ArrowRight size={16} /></button></form>
     <div className="filter-row"><span className="filter-label"><SlidersHorizontal size={15} /> FILTER BY</span><select value={classLevel || ''} onChange={(e) => setClassLevel(e.target.value ? Number(e.target.value) : undefined)} aria-label="Filter by class" data-testid="select-class"><option value="">All classes</option>{filters.data?.classes?.map((grade) => <option key={grade.level} value={grade.level}>{grade.label}</option>)}</select><select value={subject} onChange={(e) => setSubject(e.target.value)} aria-label="Filter by subject" data-testid="select-subject"><option value="">All subjects</option>{filters.data?.subjects?.map((s) => <option value={s.name} key={s.name}>{s.name}</option>)}</select><button className="clear-filters" onClick={() => { setClassLevel(undefined); setSubject(''); setQ(''); }} type="button">Clear filters</button></div>
-    {addMutation.isError && <div className="inline-error" role="alert">We couldn’t add that title just now. Please try once more.</div>}
+    {addMutation.isError && <div className="inline-error" role="alert">We couldnâ€™t add that title just now. Please try once more.</div>}
     {books.isLoading ? <Busy label="Searching the shelves" /> : books.isError ? <ErrorState retry={() => { void books.refetch(); }} /> : books.data?.length ? <div className="book-grid search-grid">{books.data.map((book) => <BookCard key={book.id} book={book} add={() => addMutation.mutate({ data: { bookId: book.id, quantity: 1 } }, { onSuccess: () => { void cache.invalidateQueries({ queryKey: getGetCartQueryKey() }); } })} adding={addMutation.isPending && addMutation.variables?.data.bookId === book.id} />)}</div> : <EmptyState title="Nothing on this shelf." text="Try a shorter search or clear a filter to see more books." action="See all books" />}
   </AppShell>;
 }
@@ -585,19 +518,19 @@ function CartPage() {
   };
   if (cartQuery.isLoading) return <AppShell active="/cart"><Busy label="Gathering your basket" /></AppShell>;
   if (cartQuery.isError) return <AppShell active="/cart"><ErrorState retry={() => { void cartQuery.refetch(); }} /></AppShell>;
-  if (placedOrder) return <AppShell active="/cart"><div className="order-success"><span className="success-check"><Check size={27} /></span><span className="eyebrow">ORDER CONFIRMED</span><h1>That’s a wrap.<br /><em>See you at the door.</em></h1><p>Your books are on their way. We’ll collect payment when they arrive.</p><div className="success-order">ORDER <b>#{placedOrder.slice(-8).toUpperCase()}</b></div><Link className="button button-primary" href={`/orders/${placedOrder}`}>Track your order <ArrowRight size={16} /></Link><Link className="text-link" href="/shop">Keep browsing</Link></div></AppShell>;
+  if (placedOrder) return <AppShell active="/cart"><div className="order-success"><span className="success-check"><Check size={27} /></span><span className="eyebrow">ORDER CONFIRMED</span><h1>Thatâ€™s a wrap.<br /><em>See you at the door.</em></h1><p>Your books are on their way. Weâ€™ll collect payment when they arrive.</p><div className="success-order">ORDER <b>#{placedOrder.slice(-8).toUpperCase()}</b></div><Link className="button button-primary" href={`/orders/${placedOrder}`}>Track your order <ArrowRight size={16} /></Link><Link className="text-link" href="/shop">Keep browsing</Link></div></AppShell>;
   if (!cart?.items?.length) return <AppShell active="/cart"><PageHeading kicker="YOUR BASKET" title="A little room for books." text="The good stuff you add will appear here." /><EmptyState title="Your basket is waiting." text="Start with a class or subject and build your school list." action="Browse the shelves" /></AppShell>;
-  return <AppShell active="/cart"><PageHeading kicker="YOUR BASKET" title="Books in the making." text={`${cart.itemCount} ${cart.itemCount === 1 ? 'book' : 'books'} on your list.`} /><div className="cart-layout"><div className="cart-lines">{(update.isError || remove.isError) && <div className="inline-error" role="alert">Your basket could not be updated. Please try again.</div>}{cart.items.map(({ book, quantity, lineTotal }) => <article className="cart-line" key={book.id}><div className="cart-book-cover"><img src={book.imageUrl || '/books-editorial.jpg'} alt={book.title} /></div><div className="cart-book-details"><div className="eyebrow">CLASS {book.classLevel} · {book.subject}</div><h3>{book.title}</h3><p>{book.author}</p><div className="quantity-control"><button aria-label="Decrease quantity" onClick={() => quantity > 1 ? updateQty(book.id, quantity - 1) : removeItem(book.id)} data-testid={`button-quantity-minus-${book.id}`}><Minus size={14} /></button><span>{quantity}</span><button aria-label="Increase quantity" onClick={() => updateQty(book.id, Math.min(20, quantity + 1))} data-testid={`button-quantity-plus-${book.id}`}><Plus size={14} /></button></div></div><div className="cart-line-end"><b>{money(lineTotal)}</b><button className="remove-link" onClick={() => removeItem(book.id)} data-testid={`button-remove-${book.id}`}>Remove</button></div></article>)}
-      <Link href="/shop" className="continue-link"><ArrowLeft size={15} /> Continue shopping</Link></div><aside className="summary-card"><span className="eyebrow">ORDER SUMMARY</span><div className="summary-row"><span>Books ({cart.itemCount})</span><b>{money(cart.subtotal)}</b></div><div className="summary-row"><span>Delivery</span><b className="delivery-included">On us</b></div><div className="summary-total"><span>Total</span><b>{money(cart.subtotal)}</b></div><button className="button button-primary checkout-button" onClick={() => setCheckout(!checkout)} data-testid="button-checkout">{checkout ? 'Checkout details' : 'Proceed to checkout'} <ArrowRight size={16} /></button><div className="payment-note"><ShieldCheck size={16} /> Secure checkout · Cash on delivery</div>
-      {checkout && <form className="checkout-form" onSubmit={submitCheckout}><h3>Where should we send them?</h3>{(['customerName','phone','addressLine','city','state','postalCode'] as const).map((name) => <label key={name}>{({ customerName: 'Full name', phone: 'Phone number', addressLine: 'Street address', city: 'City', state: 'State', postalCode: 'Postal code' })[name]}<input required minLength={name === 'customerName' || name === 'city' || name === 'state' ? 2 : name === 'addressLine' ? 5 : name === 'phone' ? 10 : 5} maxLength={name === 'phone' ? 16 : name === 'postalCode' ? 10 : undefined} type={name === 'phone' || name === 'postalCode' ? 'tel' : 'text'} value={form[name]} onChange={(e) => setForm({ ...form, [name]: e.target.value })} data-testid={`input-${name}`} /></label>)}{createOrder.isError && <p className="form-error">We couldn’t place your order. Check your details and try again.</p>}<button className="button button-primary checkout-button" disabled={createOrder.isPending} type="submit">{createOrder.isPending ? 'Placing your order…' : `Place order · ${money(cart.subtotal)}`}</button></form>}</aside></div></AppShell>;
+  return <AppShell active="/cart"><PageHeading kicker="YOUR BASKET" title="Books in the making." text={`${cart.itemCount} ${cart.itemCount === 1 ? 'book' : 'books'} on your list.`} /><div className="cart-layout"><div className="cart-lines">{(update.isError || remove.isError) && <div className="inline-error" role="alert">Your basket could not be updated. Please try again.</div>}{cart.items.map(({ book, quantity, lineTotal }) => <article className="cart-line" key={book.id}><div className="cart-book-cover"><img src={book.imageUrl || '/books-editorial.jpg'} alt={book.title} /></div><div className="cart-book-details"><div className="eyebrow">CLASS {book.classLevel} Â· {book.subject}</div><h3>{book.title}</h3><p>{book.author}</p><div className="quantity-control"><button aria-label="Decrease quantity" onClick={() => quantity > 1 ? updateQty(book.id, quantity - 1) : removeItem(book.id)} data-testid={`button-quantity-minus-${book.id}`}><Minus size={14} /></button><span>{quantity}</span><button aria-label="Increase quantity" onClick={() => updateQty(book.id, Math.min(20, quantity + 1))} data-testid={`button-quantity-plus-${book.id}`}><Plus size={14} /></button></div></div><div className="cart-line-end"><b>{money(lineTotal)}</b><button className="remove-link" onClick={() => removeItem(book.id)} data-testid={`button-remove-${book.id}`}>Remove</button></div></article>)}
+      <Link href="/shop" className="continue-link"><ArrowLeft size={15} /> Continue shopping</Link></div><aside className="summary-card"><span className="eyebrow">ORDER SUMMARY</span><div className="summary-row"><span>Books ({cart.itemCount})</span><b>{money(cart.subtotal)}</b></div><div className="summary-row"><span>Delivery</span><b className="delivery-included">On us</b></div><div className="summary-total"><span>Total</span><b>{money(cart.subtotal)}</b></div><button className="button button-primary checkout-button" onClick={() => setCheckout(!checkout)} data-testid="button-checkout">{checkout ? 'Checkout details' : 'Proceed to checkout'} <ArrowRight size={16} /></button><div className="payment-note"><ShieldCheck size={16} /> Secure checkout Â· Cash on delivery</div>
+      {checkout && <form className="checkout-form" onSubmit={submitCheckout}><h3>Where should we send them?</h3>{(['customerName','phone','addressLine','city','state','postalCode'] as const).map((name) => <label key={name}>{({ customerName: 'Full name', phone: 'Phone number', addressLine: 'Street address', city: 'City', state: 'State', postalCode: 'Postal code' })[name]}<input required minLength={name === 'customerName' || name === 'city' || name === 'state' ? 2 : name === 'addressLine' ? 5 : name === 'phone' ? 10 : 5} maxLength={name === 'phone' ? 16 : name === 'postalCode' ? 10 : undefined} type={name === 'phone' || name === 'postalCode' ? 'tel' : 'text'} value={form[name]} onChange={(e) => setForm({ ...form, [name]: e.target.value })} data-testid={`input-${name}`} /></label>)}{createOrder.isError && <p className="form-error">We couldnâ€™t place your order. Check your details and try again.</p>}<button className="button button-primary checkout-button" disabled={createOrder.isPending} type="submit">{createOrder.isPending ? 'Placing your orderâ€¦' : `Place order Â· ${money(cart.subtotal)}`}</button></form>}</aside></div></AppShell>;
 }
 
 function OrdersPage() {
   const orders = useListOrders({ query: { queryKey: getListOrdersQueryKey() } });
-  return <AppShell active="/orders"><PageHeading kicker="THE JOURNEY SO FAR" title="Your orders." text="All the books you’ve brought home, in one place." />{orders.isLoading ? <Busy label="Finding your orders" /> : orders.isError ? <ErrorState retry={() => { void orders.refetch(); }} /> : orders.data?.length ? <div className="orders-list">{orders.data.map((order) => <OrderCard order={order} key={order.id} />)}</div> : <EmptyState title="Your story starts with a book." text="Once you place an order, you’ll find updates and delivery details here." action="Explore the books" to="/shop" />}</AppShell>;
+  return <AppShell active="/orders"><PageHeading kicker="THE JOURNEY SO FAR" title="Your orders." text="All the books youâ€™ve brought home, in one place." />{orders.isLoading ? <Busy label="Finding your orders" /> : orders.isError ? <ErrorState retry={() => { void orders.refetch(); }} /> : orders.data?.length ? <div className="orders-list">{orders.data.map((order) => <OrderCard order={order} key={order.id} />)}</div> : <EmptyState title="Your story starts with a book." text="Once you place an order, youâ€™ll find updates and delivery details here." action="Explore the books" to="/shop" />}</AppShell>;
 }
 function OrderCard({ order }: { order: Order }) {
-  return <Link href={`/orders/${order.id}`} className="order-card" data-testid={`card-order-${order.id}`}><div className="order-card-head"><span className={`status-pill status-${order.status}`}>{order.status}</span><span>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span><ArrowUpRight size={16} /></div><div className="order-card-items"><div className="order-thumbs">{order.items.slice(0, 3).map((item) => <img src={item.imageUrl || '/books-editorial.jpg'} key={item.bookId} alt="" />)}</div><div><b>{order.items[0]?.title}{order.items.length > 1 ? ` + ${order.items.length - 1} more` : ''}</b><small>{order.itemCount} books · Cash on delivery</small></div></div><div className="order-card-foot"><span>Order <b>#{order.id.slice(-8).toUpperCase()}</b></span><strong>{money(order.total)}</strong></div></Link>;
+  return <Link href={`/orders/${order.id}`} className="order-card" data-testid={`card-order-${order.id}`}><div className="order-card-head"><span className={`status-pill status-${order.status}`}>{order.status}</span><span>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span><ArrowUpRight size={16} /></div><div className="order-card-items"><div className="order-thumbs">{order.items.slice(0, 3).map((item) => <img src={item.imageUrl || '/books-editorial.jpg'} key={item.bookId} alt="" />)}</div><div><b>{order.items[0]?.title}{order.items.length > 1 ? ` + ${order.items.length - 1} more` : ''}</b><small>{order.itemCount} books Â· Cash on delivery</small></div></div><div className="order-card-foot"><span>Order <b>#{order.id.slice(-8).toUpperCase()}</b></span><strong>{money(order.total)}</strong></div></Link>;
 }
 
 function OrderDetailPage() {
@@ -608,7 +541,7 @@ function OrderDetailPage() {
   if (orderQuery.isLoading) return <AppShell active="/orders"><Busy label="Loading your order details" /></AppShell>;
   if (orderQuery.isError || !order) return <AppShell active="/orders"><ErrorState retry={() => { void orderQuery.refetch(); }} /></AppShell>;
   const steps = ['placed', 'processing', 'shipped', 'delivered'];
-  return <AppShell active="/orders"><Link href="/orders" className="back-link"><ArrowLeft size={15} /> All orders</Link><PageHeading kicker={`ORDER #${order.id.slice(-8).toUpperCase()}`} title="On its way to you." text={`Placed ${new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}.`}><span className={`status-pill status-${order.status}`}>{order.status}</span></PageHeading><div className="detail-layout"><section className="detail-main"><div className="tracking-card"><div className="tracking-top"><span className="eyebrow">DELIVERY PROGRESS</span><PackageCheck size={21} /></div><div className="tracking-steps">{steps.map((step, index) => { const current = steps.indexOf(order.status); return <div className={`tracking-step ${index <= current ? 'step-done' : ''}`} key={step}><span>{index < current ? <Check size={13} /> : index + 1}</span><small>{step}</small></div>; })}</div><div className="tracking-line" /></div><div className="detail-items"><h2>In this parcel</h2>{order.items.map((item) => <div className="detail-item" key={item.bookId}><img src={item.imageUrl || '/books-editorial.jpg'} alt={item.title} /><div><b>{item.title}</b><small>{item.quantity} × {money(item.unitPrice)}</small></div><strong>{money(item.lineTotal)}</strong></div>)}</div></section><aside className="summary-card address-card"><span className="eyebrow">DELIVERING TO</span><h3>{order.customerName}</h3><p>{order.addressLine}<br />{order.city}, {order.state} {order.postalCode}</p><div className="address-divider" /><span className="eyebrow">PAYMENT</span><p>Cash on delivery<br />{order.phone}</p><div className="summary-total"><span>Order total</span><b>{money(order.total)}</b></div></aside></div></AppShell>;
+  return <AppShell active="/orders"><Link href="/orders" className="back-link"><ArrowLeft size={15} /> All orders</Link><PageHeading kicker={`ORDER #${order.id.slice(-8).toUpperCase()}`} title="On its way to you." text={`Placed ${new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}.`}><span className={`status-pill status-${order.status}`}>{order.status}</span></PageHeading><div className="detail-layout"><section className="detail-main"><div className="tracking-card"><div className="tracking-top"><span className="eyebrow">DELIVERY PROGRESS</span><PackageCheck size={21} /></div><div className="tracking-steps">{steps.map((step, index) => { const current = steps.indexOf(order.status); return <div className={`tracking-step ${index <= current ? 'step-done' : ''}`} key={step}><span>{index < current ? <Check size={13} /> : index + 1}</span><small>{step}</small></div>; })}</div><div className="tracking-line" /></div><div className="detail-items"><h2>In this parcel</h2>{order.items.map((item) => <div className="detail-item" key={item.bookId}><img src={item.imageUrl || '/books-editorial.jpg'} alt={item.title} /><div><b>{item.title}</b><small>{item.quantity} Ã— {money(item.unitPrice)}</small></div><strong>{money(item.lineTotal)}</strong></div>)}</div></section><aside className="summary-card address-card"><span className="eyebrow">DELIVERING TO</span><h3>{order.customerName}</h3><p>{order.addressLine}<br />{order.city}, {order.state} {order.postalCode}</p><div className="address-divider" /><span className="eyebrow">PAYMENT</span><p>Cash on delivery<br />{order.phone}</p><div className="summary-total"><span>Order total</span><b>{money(order.total)}</b></div></aside></div></AppShell>;
 }
 function useRouteParams(): { orderId?: string } {
   // Wouter exposes params through its hook; this stable wrapper keeps detail routing focused.
@@ -618,14 +551,6 @@ function useRouteParams(): { orderId?: string } {
 }
 
 function ProfilePage() {
-<<<<<<< HEAD
-  const { user, isLoaded } = useUser();
-  const { signOut } = useClerk();
-  const orders = useListOrders({ query: { queryKey: getListOrdersQueryKey() } });
-  const [, setLocation] = useLocation();
-  const name = user?.fullName || user?.firstName || 'Book Bazaar reader';
-  return <AppShell active="/profile"><PageHeading kicker="YOUR BOOK BAZAAR" title="A little about you." text="Your account, your orders, your school-year essentials." /><div className="profile-layout"><section className="profile-card"><div className="profile-avatar">{isLoaded ? (user?.firstName?.slice(0,1) || 'B') : '…'}</div><div><span className="eyebrow">SIGNED IN AS</span><h2>{name}</h2><p>{user?.primaryEmailAddress?.emailAddress || ''}</p></div><span className="verified-mark"><ShieldCheck size={16} /> Verified account</span></section><section className="profile-quick"><Link href="/orders" className="profile-action"><span className="profile-action-icon"><ClipboardList size={19} /></span><span><b>Your orders</b><small>{orders.data?.length || 0} orders placed</small></span><ChevronRight size={17} /></Link><Link href="/cart" className="profile-action"><span className="profile-action-icon"><ShoppingBag size={19} /></span><span><b>Your basket</b><small>Pick up where you left off</small></span><ChevronRight size={17} /></Link><button className="profile-action logout-action" onClick={() => signOut({ redirectUrl: basePath || '/' }).then(() => setLocation('/'))} data-testid="button-sign-out"><span className="profile-action-icon"><LogOut size={19} /></span><span><b>Sign out</b><small>See you again soon</small></span><ChevronRight size={17} /></button></section><div className="profile-help"><CircleHelp size={18} /><span><b>Need a hand?</b><small>We’re happy to help with your order or book list.</small></span><a href="mailto:hello@bookbazaar.in" className="text-link">Get in touch <ArrowUpRight size={14} /></a></div></div></AppShell>;
-=======
   const { user, isLoaded } = useSafeUser();
   const orders = useListOrders({ query: { queryKey: getListOrdersQueryKey() } });
   const [, setLocation] = useLocation();
@@ -633,8 +558,7 @@ function ProfilePage() {
   const handleSignOut = () => {
     setLocation('/');
   };
-  return <AppShell active="/profile"><PageHeading kicker="YOUR BOOK BAZAAR" title="A little about you." text="Your account, your orders, your school-year essentials." /><div className="profile-layout"><section className="profile-card"><div className="profile-avatar">{isLoaded ? (user?.firstName?.slice(0,1) || 'B') : '…'}</div><div><span className="eyebrow">SIGNED IN AS</span><h2>{name}</h2><p>{user?.primaryEmailAddress?.emailAddress || ''}</p></div><span className="verified-mark"><ShieldCheck size={16} /> Verified account</span></section><section className="profile-quick"><Link href="/orders" className="profile-action"><span className="profile-action-icon"><ClipboardList size={19} /></span><span><b>Your orders</b><small>{orders.data?.length || 0} orders placed</small></span><ChevronRight size={17} /></Link><Link href="/cart" className="profile-action"><span className="profile-action-icon"><ShoppingBag size={19} /></span><span><b>Your basket</b><small>Pick up where you left off</small></span><ChevronRight size={17} /></Link><button className="profile-action logout-action" onClick={handleSignOut} data-testid="button-sign-out"><span className="profile-action-icon"><LogOut size={19} /></span><span><b>Sign out</b><small>See you again soon</small></span><ChevronRight size={17} /></button></section><div className="profile-help"><CircleHelp size={18} /><span><b>Need a hand?</b><small>We’re happy to help with your order or book list.</small></span><a href="mailto:hello@bookbazaar.in" className="text-link">Get in touch <ArrowUpRight size={14} /></a></div></div></AppShell>;
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
+  return <AppShell active="/profile"><PageHeading kicker="YOUR BOOK BAZAAR" title="A little about you." text="Your account, your orders, your school-year essentials." /><div className="profile-layout"><section className="profile-card"><div className="profile-avatar">{isLoaded ? (user?.firstName?.slice(0,1) || 'B') : 'â€¦'}</div><div><span className="eyebrow">SIGNED IN AS</span><h2>{name}</h2><p>{user?.primaryEmailAddress?.emailAddress || ''}</p></div><span className="verified-mark"><ShieldCheck size={16} /> Verified account</span></section><section className="profile-quick"><Link href="/orders" className="profile-action"><span className="profile-action-icon"><ClipboardList size={19} /></span><span><b>Your orders</b><small>{orders.data?.length || 0} orders placed</small></span><ChevronRight size={17} /></Link><Link href="/cart" className="profile-action"><span className="profile-action-icon"><ShoppingBag size={19} /></span><span><b>Your basket</b><small>Pick up where you left off</small></span><ChevronRight size={17} /></Link><button className="profile-action logout-action" onClick={handleSignOut} data-testid="button-sign-out"><span className="profile-action-icon"><LogOut size={19} /></span><span><b>Sign out</b><small>See you again soon</small></span><ChevronRight size={17} /></button></section><div className="profile-help"><CircleHelp size={18} /><span><b>Need a hand?</b><small>Weâ€™re happy to help with your order or book list.</small></span><a href="mailto:hello@bookbazaar.in" className="text-link">Get in touch <ArrowUpRight size={14} /></a></div></div></AppShell>;
 }
 
 function NotFound() {
@@ -645,10 +569,6 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
 }
 function App() {
-<<<<<<< HEAD
-  return <TooltipProvider><WouterRouter base={basePath}><RoutedErrorBoundary><ClerkRoutes /></RoutedErrorBoundary></WouterRouter><Toaster /></TooltipProvider>;
-=======
   return <TooltipProvider><WouterRouter base={basePath}><RoutedErrorBoundary><AppRoutes /></RoutedErrorBoundary></WouterRouter><Toaster /></TooltipProvider>;
->>>>>>> ebfee40 (feat: standalone frontend - remove backend dependency, add mock data and local storage)
 }
 export default App;
